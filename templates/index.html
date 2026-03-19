@@ -1,19 +1,85 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Flight Tracker</title>
+    <title>My Personal Flight</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f3f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 80px auto;
+            text-align: center;
+        }
+
+        h1 {
+            color: #202124;
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input {
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 30%;
+            min-width: 150px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1558b0;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Flight Tracker</h1>
 
-    <form action="/search" method="post">
-        <label>Source:</label>
-        <input type="text" name="source"><br><br>
+<div class="container">
+    <h1>My Personal Flight</h1>
 
-        <label>Destination:</label>
-        <input type="text" name="destination"><br><br>
-
-        <button type="submit">Search Flights</button>
+    <form action="/search" method="post" class="search-box">
+        <input type="text" name="source" placeholder="From (e.g. Dallas)">
+        <input type="text" name="destination" placeholder="To (e.g. New York)">
+        <input type="date" name="date">
+        <button type="submit">Search</button>
     </form>
+
+    <div class="result">
+        <!-- Result will appear here -->
+    </div>
+</div>
+
 </body>
 </html>
