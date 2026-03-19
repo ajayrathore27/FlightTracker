@@ -1,6 +1,17 @@
-print("Welcome to Flight Tracker")
+from flask import Flask, request, render_template
 
-def search_flights(source, destination):
-    print(f"Searching flights from {source} to {destination}...")
+app = Flask(__name__)
 
-search_flights("Dallas", "New York")
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+@app.route('/search', methods=['POST'])
+def search():
+    source = request.form['source']
+    destination = request.form['destination']
+    result = f"Searching flights from {source} to {destination}"
+    return result
+
+if __name__ == '__main__':
+    app.run(debug=True)
