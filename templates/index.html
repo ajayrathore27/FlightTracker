@@ -1,85 +1,515 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My Personal Flight</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f1f3f4;
-            margin: 0;
-            padding: 0;
-        }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SkySearch – Find Cheap Flights</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --blue:       #1a73e8;
+    --blue-dark:  #1557b0;
+    --blue-light: #e8f0fe;
+    --surface:    #ffffff;
+    --bg:         #f8f9fa;
+    --border:     #dadce0;
+    --text:       #202124;
+    --text-2:     #5f6368;
+    --red:        #ea4335;
+    --green:      #34a853;
+    --radius:     8px;
+    --shadow:     0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.14);
+    --shadow-lg:  0 4px 12px rgba(0,0,0,.15);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Roboto', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-        .container {
-            max-width: 900px;
-            margin: 80px auto;
-            text-align: center;
-        }
+  /* NAV */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .nav-logo {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--blue);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--text); }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background .15s;
+    text-decoration: none;
+  }
+  .nav-link:hover { background: var(--bg); }
+  .nav-link.active { background: var(--blue-light); color: var(--blue); font-weight: 500; }
 
-        h1 {
-            color: #202124;
-            font-size: 36px;
-            margin-bottom: 30px;
-        }
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0d47a1 0%, #1565c0 40%, #1976d2 70%, #42a5f5 100%);
+    padding: 64px 24px 120px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-title {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 48px;
+    font-weight: 400;
+    color: white;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .hero-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,.75);
+    position: relative;
+  }
 
-        .search-box {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
+  /* SEARCH CARD */
+  .search-card {
+    background: var(--surface);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    padding: 24px;
+    max-width: 900px;
+    margin: -72px auto 0;
+    position: relative;
+    z-index: 10;
+  }
 
-        input {
-            padding: 12px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            width: 30%;
-            min-width: 150px;
-        }
+  /* TRIP TYPE + PASSENGERS ROW */
+  .search-options {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .pill-select {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .pill-select select {
+    appearance: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 28px 6px 12px;
+    font-size: 14px;
+    font-family: 'Roboto', sans-serif;
+    color: var(--text);
+    cursor: pointer;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .pill-select select:hover { border-color: var(--text-2); }
+  .pill-select select:focus { border-color: var(--blue); }
+  .pill-select::after {
+    content: '▾';
+    position: absolute;
+    right: 10px;
+    pointer-events: none;
+    font-size: 12px;
+    color: var(--text-2);
+  }
 
-        button {
-            padding: 12px 20px;
-            font-size: 16px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
+  /* AIRPORT INPUTS */
+  .airports-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    align-items: stretch;
+  }
+  .input-box {
+    flex: 1;
+    position: relative;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .input-box:hover { border-color: var(--text-2); }
+  .input-box:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(26,115,232,.2);
+  }
+  .input-box label {
+    position: absolute;
+    top: 10px;
+    left: 40px;
+    font-size: 11px;
+    color: var(--text-2);
+    pointer-events: none;
+    font-weight: 500;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+  }
+  .input-box .icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: var(--text-2);
+    font-size: 18px;
+  }
+  .input-box input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 30px 12px 10px 40px;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+    background: transparent;
+    color: var(--text);
+  }
+  .input-box input::placeholder { color: var(--border); }
 
-        button:hover {
-            background-color: #1558b0;
-        }
+  .swap-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--text-2);
+    align-self: center;
+    flex-shrink: 0;
+    transition: background .15s, box-shadow .15s;
+  }
+  .swap-btn:hover { background: var(--bg); box-shadow: var(--shadow); }
 
-        .result {
-            margin-top: 30px;
-            font-size: 18px;
-            color: #333;
-        }
-    </style>
+  /* DATE ROW */
+  .dates-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .date-box {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    position: relative;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .date-box:hover { border-color: var(--text-2); }
+  .date-box:focus-within {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(26,115,232,.2);
+  }
+  .date-box label {
+    position: absolute;
+    top: 10px;
+    left: 12px;
+    font-size: 11px;
+    color: var(--text-2);
+    pointer-events: none;
+    font-weight: 500;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+  }
+  .date-box input[type="date"] {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 30px 12px 10px;
+    font-size: 15px;
+    font-family: 'Roboto', sans-serif;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .date-box.disabled { opacity: .4; pointer-events: none; }
+
+  /* SEARCH BTN ROW */
+  .search-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+  }
+  .cabin-wrap { margin-right: auto; }
+  .btn-search {
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-family: 'Google Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background .2s, box-shadow .2s;
+    box-shadow: 0 2px 6px rgba(26,115,232,.4);
+  }
+  .btn-search:hover {
+    background: var(--blue-dark);
+    box-shadow: 0 4px 12px rgba(26,115,232,.5);
+  }
+
+  /* ERRORS */
+  .errors {
+    background: #fce8e6;
+    border: 1px solid #f5c6c2;
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+  }
+  .errors ul { list-style: none; }
+  .errors li {
+    color: #c5221f;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .errors li + li { margin-top: 4px; }
+
+  /* BODY CONTENT */
+  .page-content {
+    max-width: 900px;
+    margin: 32px auto;
+    padding: 0 24px;
+  }
+  .section-title {
+    font-family: 'Google Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  /* EXPLORE GRID */
+  .explore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .explore-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: box-shadow .2s, transform .15s;
+    border: 1px solid var(--border);
+  }
+  .explore-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+  }
+  .explore-dest { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+  .explore-price {
+    font-size: 14px;
+    color: var(--green);
+    font-weight: 500;
+  }
+  .explore-info { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .hero-title { font-size: 32px; }
+    .airports-row { flex-direction: column; }
+    .swap-btn { display: none; }
+    .dates-row { flex-direction: column; }
+    .nav-links { display: none; }
+  }
+</style>
 </head>
-
 <body>
 
-<div class="container">
-    <h1>My Personal Flight</h1>
+<nav>
+  <a class="nav-logo" href="/">✈ <span>Sky</span>Search</a>
+  <div class="nav-links">
+    <a class="nav-link active" href="/">Flights</a>
+    <a class="nav-link" href="#">Hotels</a>
+    <a class="nav-link" href="#">Packages</a>
+  </div>
+</nav>
 
-    <form action="/search" method="post" class="search-box">
-        <input type="text" name="source" placeholder="From (e.g. Dallas)">
-        <input type="text" name="destination" placeholder="To (e.g. New York)">
-        <input type="date" name="date">
-        <button type="submit">Search</button>
-    </form>
-
-    <div class="result">
-        <!-- Result will appear here -->
-    </div>
+<div class="hero">
+  <h1 class="hero-title">Flights</h1>
+  <p class="hero-sub">Search hundreds of airlines at once</p>
 </div>
 
+<div style="padding: 0 24px;">
+<div class="search-card">
+
+  {% if errors %}
+  <div class="errors">
+    <ul>
+      {% for e in errors %}<li>⚠ {{ e }}</li>{% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <form method="POST" action="/search" id="searchForm">
+    <!-- Options row -->
+    <div class="search-options">
+      <div class="pill-select">
+        <select name="trip_type" id="tripType" onchange="toggleReturn()">
+          <option value="one-way" {% if form_data and form_data.trip_type=='one-way' %}selected{% endif %}>One way</option>
+          <option value="round-trip" {% if form_data and form_data.trip_type=='round-trip' %}selected{% endif %}>Round trip</option>
+          <option value="multi-city" {% if form_data and form_data.trip_type=='multi-city' %}selected{% endif %}>Multi-city</option>
+        </select>
+      </div>
+      <div class="pill-select">
+        <select name="passengers">
+          {% for n in range(1,10) %}
+          <option value="{{ n }}" {% if form_data and form_data.passengers==n|string %}selected{% endif %}>
+            {{ n }} passenger{{ 's' if n>1 else '' }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <!-- Airport row -->
+    <div class="airports-row">
+      <div class="input-box">
+        <span class="icon">🛫</span>
+        <label>From</label>
+        <input type="text" name="source" placeholder="City or airport code"
+               value="{{ form_data.source if form_data else '' }}"
+               autocomplete="off" required maxlength="50"/>
+      </div>
+      <button type="button" class="swap-btn" onclick="swapAirports()" title="Swap">⇄</button>
+      <div class="input-box">
+        <span class="icon">🛬</span>
+        <label>To</label>
+        <input type="text" name="destination" placeholder="City or airport code"
+               value="{{ form_data.destination if form_data else '' }}"
+               autocomplete="off" required maxlength="50"/>
+      </div>
+    </div>
+
+    <!-- Date row -->
+    <div class="dates-row">
+      <div class="date-box">
+        <label>Departure</label>
+        <input type="date" name="date"
+               value="{{ form_data.date if form_data else today }}"
+               min="{{ today }}" required/>
+      </div>
+      <div class="date-box" id="returnBox" style="opacity:.4; pointer-events:none;">
+        <label>Return</label>
+        <input type="date" name="return_date"
+               value="{{ form_data.return_date if form_data else next_week }}"
+               min="{{ today }}"/>
+      </div>
+    </div>
+
+    <!-- Footer row -->
+    <div class="search-footer">
+      <div class="cabin-wrap">
+        <div class="pill-select">
+          <select name="cabin">
+            {% for c in ['Economy','Premium Economy','Business','First'] %}
+            <option value="{{ c }}" {% if form_data and form_data.cabin==c %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="pill-select">
+        <select name="sort_by">
+          <option value="price">Sort: Price</option>
+          <option value="duration">Sort: Duration</option>
+          <option value="stops">Sort: Stops</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-search">🔍 Search flights</button>
+    </div>
+  </form>
+</div>
+</div>
+
+<div class="page-content">
+  <p class="section-title">Popular destinations</p>
+  <div class="explore-grid">
+    {% set dests = [
+      ('New York', 'JFK', '$89'),
+      ('Los Angeles', 'LAX', '$129'),
+      ('Miami', 'MIA', '$99'),
+      ('Chicago', 'ORD', '$79'),
+      ('London', 'LHR', '$349'),
+      ('Paris', 'CDG', '$399'),
+      ('Tokyo', 'NRT', '$549'),
+      ('Dubai', 'DXB', '$499'),
+    ] %}
+    {% for name, code, price in dests %}
+    <div class="explore-card" onclick="fillSearch('{{ code }}')">
+      <div class="explore-dest">{{ name }}</div>
+      <div class="explore-price">From {{ price }}</div>
+      <div class="explore-info">{{ code }} · Round trip</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+  function toggleReturn() {
+    const type = document.getElementById('tripType').value;
+    const box  = document.getElementById('returnBox');
+    if (type === 'round-trip') {
+      box.style.opacity = '1';
+      box.style.pointerEvents = 'auto';
+    } else {
+      box.style.opacity = '.4';
+      box.style.pointerEvents = 'none';
+    }
+  }
+
+  function swapAirports() {
+    const src  = document.querySelector('[name="source"]');
+    const dest = document.querySelector('[name="destination"]');
+    [src.value, dest.value] = [dest.value, src.value];
+  }
+
+  function fillSearch(code) {
+    document.querySelector('[name="destination"]').value = code;
+    document.querySelector('[name="source"]').focus();
+  }
+
+  // Init on load
+  toggleReturn();
+</script>
 </body>
 </html>
